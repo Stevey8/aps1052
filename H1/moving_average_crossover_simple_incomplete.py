@@ -49,22 +49,26 @@ dfP['252d'] = np.round(dfP['Close'].rolling(window=252).mean(),2)
 dfP['42-252'] = dfP['42d'] - dfP['252d']
 
 #TODO 
-dfP['pct_rets'] = #INSERT CODE HERE USING CLOSE PRICES#
-
+# percent return using close price
+dfP['pct_rets'] = dfP['Close'].pct_change()
 
 X = 0
 
 
 dfP['Stance'] = np.where((dfP['42-252'] > X), 1, 0)
-dfP['Stance'] = #INSERT CODE HERE#
+
+#TODO 
+dfP['Stance'] = np.where((dfP['42-252'] < -X), -1, dfP['Stance'])
 
 
-
-dfP['syst_rets'] = #INSERT CODE HERE FOR SYSTEM RETURNS#
-dfP['syst_cum_rets'] = #INSERT CODE HERE#
-dfP['mkt_cum_rets'] =  #INSERT CODE HERE#
+#TODO 
+dfP['syst_rets'] = dfP['Stance'].shift(1) * dfP['pct_rets'] # shift(1) to use yesterday's stance
+dfP['syst_cum_rets'] = (1 + dfP['syst_rets']).cumprod()
+dfP['mkt_cum_rets'] =  (1 + dfP['pct_rets']).cumprod()
 
 dfP[['mkt_cum_rets','syst_cum_rets']].plot(grid=True,figsize=(8,5)) #plotting returns percent cumul
+
+
 
 start = 1 # or should start at dfP['sys_cum_rets.iloc].iloc[2]
 
@@ -82,9 +86,9 @@ TotalAnnReturn = (end_val-start_val)/start_val/(days/periods)
 years = days/periods
 CAGR = ((((end_val/start_val)**(1/years)))-1)
 
-
+# TODO: insert code for the sharpe performance metric
 try:
-    sharpe =  #INSERT CODE HERE FOR THE SHARPE PERFORMANCE METRIC#
+    sharpe =  dfP['syst_rets'].mean()/dfP['syst_rets'].std() * np.sqrt(periods)
 except ZeroDivisionError:
     sharpe = 0.0
 
