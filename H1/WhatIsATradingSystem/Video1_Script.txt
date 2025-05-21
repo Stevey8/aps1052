@@ -1,0 +1,526 @@
+<speak>
+<prosody rate="slow">
+
+We are going to show you how back-testing a trading system works.
+
+Go ahead and open the Excel spreadsheet 'dfP-moving-average-crossover-simple-dot-xlsx.'
+
+Go ahead and open the worksheet entitled 'Steps.'
+Here we see the steps of a trading system.
+These steps are:
+Number 1: we are going to do some data downloading and pre-processing.
+In fact, you will see that 
+the data is already downloaded onto the next worksheet of this spreadsheet, and
+The data is from yahoo finance.
+Number 2: we are going to do some signal engineering.
+That is, we are going to generate a number signal that is either categorical or continuous.
+Number 3: we are going to do a trading rule enunciation.
+Here we are going to decide when to buy and when to sell based on the signal in step 2.
+We decide whether we buy when the signal goes up 
+(because our trading system is trend following), or
+we sell when the signal goes up (because our trading system is contrarian).
+Number 4: we are going to do a stance calculation.
+Here we are going to decide exactly how many contracts to buy or sell.
+Number 5: we are going to do a system return calculation.
+Here we are going to calculate the returns of the daily trading operations.
+Number 6: we are going to do an equity curve calculation.
+Here we are going to cumulate the daily returns, so as 
+to obtain an equity curve of the trading system returns over a long interval of time.
+Number 7: we are going to do some first-level evaluation metrics.
+We are going to use the returns and cumulated returns
+to graph and summarize the financial performance of our trading system.
+There exist many financial summary metrics.
+Here we calculate a few, such as the annual return, the CAGR, and the SHARPE ratio.
+Number 8: we are going to do a second-level evaluation metric.
+We are going to use the returns of our trading system
+to summarize the statistical performance of our trading system,
+in a robust way, by using a bootstrap method such as,
+White's reality check.
+
+Go ahead and open the worksheet called 'trading percent returns.'
+In this worksheet we implement a trading system, and
+do the calculations using percent returns, whereas
+in the worksheet called 'Trading log returns,'
+we implement the exact same trading system, and
+do the calculations using log returns, so
+you can see how to do the calculations in both types of returns.
+
+So, returning to the worksheet called 'Trading percent returns,'
+the trading system we implement here,
+is called a 'moving average cross-over' trading system, because
+the signal is based on an indicator called a 'moving average cross-over' indicator.
+
+The logic of this worksheet is as follows:
+As you move from left to right,
+each column performs a required calculation for the trading system, 
+a calculation that reflects
+each one of the 7 steps of the trading system you saw already, one by one.
+On the other hand,
+as you move down the worksheet,
+you see on the leftmost column a date,
+and the date is increasing by the row,
+from January 3, 2000 to December 31, 2018, in daily steps.
+So the rows are data samples ordered by date, and
+time moves forward as we move down.
+
+So going back to the top rows of the worksheet,
+the first columns, from column A to column G,
+consist of data that has been downloaded from yahoo finance.
+The data is the price and volume data of the S-P-Y ETF.
+An ETF is an "exchange traded," passive, "indexed fund" that is indexed to some well-known index such as O-E-X or S and P 500.
+And is listed as a single stock in an exchange using a ticker symbol.
+The S-P-Y ETF is indexed to the S and P 500 index,
+an index of notable 500 U.S. companies, and
+the S-P-Y are the letters that make up its ticker, or identifier,
+with which the ETF is listed on the exchange.
+So the S-P-Y ETF is just a portfolio of S and P 500 stocks that 
+is traded just like any single stock.
+
+You see here the column entitled 'Open,'
+which contains the first price at the opening of the NYSE exchange at 9:30 AM.
+You see the column entitled 'High,'
+which contains the highest price arrived at that day.
+You see the column entitled 'Low,'
+which contains the lowest price arrived at that day.
+You see the column entitled 'Close,'
+which contains the last price at the closing of the NYSE exchange at 4:30 PM.
+You see the column 'Adj close' which stands for adjusted close,
+which is the close price plus dividends, splits, and other relevant cash flows.
+You see the column entitled 'Volume,'
+which contains the number of S-P-Y stocks traded at the exchange that day.
+
+In this course, 
+we make no distinction between close and adjusted close, and
+we use either of them in our signal and return calculations, but
+the correct way is to use the close for signal calculations, and
+to use the adjusted close for exact returns calculations, if you desire, although
+it is also possible to use the close price for conservative returns calculations.
+
+When using the adjusted close,
+you need to accommodate for the fact that
+every day yahoo finance re-calculates the entire adjusted close series 
+of every stock
+starting from day one to today, in order
+to incorporate special cash flows, and so,
+the prices in the adjusted close column 
+can vary depending on the date of the download of the data, and
+this can be very confusing, unless you are aware.
+
+The open, high, low, close, and volume numbers,
+are also known as O-H-L-C-V data.
+On the other hand, the open, high, low, and close prices,
+are also known as a price bar.
+You can select the first price bar by selecting row 3, columns A to E.
+
+Go ahead and open the worksheet entitled 'Price Bar.'
+Here we see how a price bar is usually represented.
+The horizontal axis is time.
+The vertical axis is price.
+A single bar price is for a single day, because
+we have daily data.
+The open and the close are indicated by left and right-oriented dashes on the bar, whereas
+the high and the low are indicated by the upper and lower bar limits.
+
+So go ahead and return to the worksheet entitled 'Trading percent returns.'
+Having looked at the downloaded data in columns A to G,
+which contain step 1 of our steps in a trading system,
+let us look at columns H to J.
+
+These three columns execute step 2 of our trading system steps; namely,
+signal engineering.
+
+Columns H and I contain two trading indicators that
+we calculated using close prices.
+Column H, entitled 'Short M-A,' is a short-moving average indicator.
+The lookback window length of the indicator is in cell H1, and is equal to 42 days.
+Column I, entitled 'Long M-A,' is a long-moving average indicator.
+The lookback window length of the indicator is in cell I1, and is equal to 252 days.
+What is a moving average?
+
+Go ahead, and open the worksheet entitled 'MA, or moving average.'
+A moving average is an average that is calculated over a sliding window.
+For example, we are going to base our moving average on the close in column A.
+To calculate a 3-day moving average, we go to column B, and open cell B4.
+Cell B4 contains the average calculated over the close prices of the last 3 days, from cell A2 to cell A4.
+Cell B5 contains the average calculated over the close prices of the last 3 days, from cell A3 to cell A5.
+Cell B6 contains the average calculated over the close prices of the last 3 days, from cell A4 to cell A6.
+And so on.
+Similarly,
+To calculate a 4-day moving average we go to column C, and open cell C5.
+Cell C5 contains the average calculated over the close prices of the last 4 days, from cell A2 to cell A5.
+Cell C6 contains the average calculated over the close prices of the last 4 days, from cell A3 to cell A6.
+Cell C7 contains the average calculated over the close prices of the last 4 days, from cell A4 to cell A7.
+and so on.
+
+Go ahead and return to the worksheet entitled 'Trading percent returns.'
+Let us focus on column J, entitled 'Short moving minus long moving average.' 
+It calculates a signal which 
+is the difference of subtracting the long moving average from the short moving average.
+This difference is our engineered signal, the endpoint of step 2 in our trading system steps.
+This signal is also called a 'moving average cross-over indicator.' 
+This signal is used for step 3 of our trading system steps; namely,
+the trading rule enunciation, where
+we decide when to buy and when to sell.
+
+Open once more the worksheet entitled 'Moving average, or M-A.'
+Focus on the chart.
+This chart has time on the horizontal axis, and price on the vertical axis.
+This chart graphs the close price as a line colored blue.
+It graphs the short moving average as a line colored red.
+It graphs the long moving average as a line colored green.
+Note how the short-moving average colored red hugs the blue price line pretty closely.
+Note how the green long moving average follows the trend of the blue prices, but
+does not follow them too closely, unlike the red short moving average.
+
+We state the trading rule in two parts as follows:
+First part:
+Hold a long position in the S-P-Y when the red line is over the green line.
+During this time the "moving average cross-over" indicator is positive (above zero).
+
+Second part:
+Hold a short position in the S-P-Y when the red line is under the green line.
+During this time the "moving average cross-over" indicator is negative (below zero).
+
+So at the trading rule calculation step, we are saying:
+When our indicator is positive (because prices have been increasing) we adopt a long position,
+when our indicator is negative (because prices have been decreasing), we adopt a short position.
+So this is a trend following trading system.
+We have indicated right above the time axis, using curly brackets, from left to right,
+the interval of the short position, and then, the interval of the long position.
+
+Step 4 in our trading system steps is the stance calculation.
+We state that:
+A long position is defined as holding a single long contract, represented as a position=1.
+A short position is defined as holding a single short contract equal to negative 1, represented as a position= negative 1.
+Holding no position (e.g. after liquidation) is represented as a position=0.
+
+To effectuate this stance calculation, you have to buy or sell contracts of the S-P-Y ETF
+every time the red line crosses over or crosses under the green line, 
+(This is why this trading system is called a "moving average cross-over" system).
+Every time the red line crosses over the green line, 
+we liquidate for cash whatever contracts we had on-hand, and immediately buy 1 S-P-Y contract,
+every time the red line crosses under the green line,
+we liquidate for cash whatever contracts we had on-hand, and immediately sell 1 S-P-Y contract.
+
+Go ahead and return the worksheet entitled 'Trading percent returns.'
+Focus on column L entitled 'Stance', go down to cell L255.
+Here we calculate the first short position (-1) based on the negative value of column J (the moving average cross-over indicator).
+Now go to L851.
+Here we calculate the first long position (+1) based on the positive value of column J (the moving average cross-over indicator).
+Have a look at the stance column, column L, and
+verify that the stance changes position from 0 to 1 to -1 rather seldom.
+This finishes step 4 of our trading system steps, the stance calculation.
+
+Going on to step 5 of our trading system steps, the system returns calculation.
+Focus on column M, entitled 'Trading system percent returns.'
+The calculations of column M are based on the stance calculation in column L, and
+on the 'market percent returns' in column K, where
+by 'market' we mean the stock we are trading.
+We have already looked at the stance calculation in column L.
+Let us look at the 'market percent returns' in column K, going on to cell K4.
+Here we see how to calculate a percent return based on column E, the close price:
+it is just today's close price minus yesterday's close price, that difference divided by yesterday's close price.
+Focus again in column M, going to cell M256.
+Here we see that 
+to calculate today's trading system percent return,
+you have to:
+multiply the day's stance by the next day's market percent return.
+The reason is that the trading system has to take a position at time t, and 
+then the trading system realizes the return during the next t plus 24 hours.
+So what happened in cell M256 is that 
+the position adopted the day before was short (-1); that is, 
+the trading system was predicting that the stock would go down, but
+the stock went up (experiencing a positive return), and so as a result,
+the trading system got penalized in cell M256 with a negative return.
+However in cell M257, 
+the position adopted the day before continues short (-1); that is, 
+the trading system continues to predict that the stock will go down, and
+the stock does go down (experiencing a negative return), and so as a result,
+the trading system gets rewarded in cell M257 with a positive return.
+
+Step 6 in our trading system steps is the equity curve calculation.
+This involves calculating two equity curves,
+the equity curve of the trading system,
+and the equity curve of the stock (which we calculate so we can compare the two).
+
+We begin with the equity curve calculation of the trading system.
+The equity curve of the trading system is the trading system's bank account balance,
+if that balance is going up, then 
+the trading system is doing well, which 
+is what we want.
+
+The equity curve calculation is a cumulation of the returns over time.
+The cumulation of percent returns is done in two steps.
+First, we add 1 to the trading system percent returns.
+We do this in column N, entitled "Add 1."
+This turns the percent returns into factors that we can multiply cumulatively, as
+is required by the cumulative percent return formula.
+Second,
+focusing on column O, entitled "Trading system cumulative returns,"
+go to cell O4.
+Note that here we use the product function to multiply the first return factor,
+ignore the rest of the formula for now,
+go down to cell O5.
+Note that here we use the product function to multiply the first two return factors,
+go down to cell O6.
+Note that here we use the product function to multiply the first three return factors, and so on.
+Stay in cell O6.
+Now, let us look at the rest of the formula in cell O6.
+Note that after the product function, we subtract a 1; that is, we have a "minus 1".
+Why?
+Because we added a 1 to the percent returns, to create the return factors, and
+now, we have to get rid of the 1.
+So basically the rule for percent return cumulation is that
+you first add a 1, and 
+then you get rid of that 1.
+What about the final 1, this "plus 1," at the end of the formula in cell O6?
+This final 1 is optional.
+The reason people add this final one is that
+when graphing the cumulative returns,
+people want that graph to start at 1.
+Why?
+Because we want to be able to say that 
+our initial investment in the trading system was 1 dollar.
+This is why we put a 1 at the beginning of column O, in cell O3.
+
+By the way, all the financial formulas used in this worksheet, 
+come from a list of formulas that
+you can consult in a spreadsheet called "Returns.xlsx," 
+included with the materials for this video.
+In particular, the cumulative returns formula for percent returns, 
+is in the worksheet called "Formulas,"
+in column B, 
+corresponding to the formulas pertaining to percent returns,
+in row 5, 
+so cell B5.
+
+To finish step 5:
+Next, we want to calculate the equity curve of the stock, 
+that is, the cumulative returns of the stock,
+so as to be able to compare 
+the trading system equity curve, and 
+the stock equity curve.
+
+So going on to column Q entitled "Market cumulative returns", where 
+by "market" we mean the stock we are trading.
+Open cell Q4, and look at the formula there.
+The formula is the same as the formula in O4; that is,
+the formula is using the product function 
+to cumulatively multiply the market return factors in column P, where
+we already added a 1 to the market percent returns, and, after that,
+it is getting rid of the 1 by subtraction, and, after that,
+it is adding the final optional 1.
+So column Q like column O also starts with a 1, which
+you can see in Q3.
+
+The equity curve of the market is also called the "buy and hold" curve.
+It is the same curve as the curve of the close prices, but 
+it starts at one.
+To see this,
+go ahead and move left to column A,
+and then move down to row 29, where
+we show you a chart containing the graph of two curves.
+In this chart, the horizontal axis is time.
+There are two vertical axes:
+the one on the left contains the close price levels,
+the one on the right contains the buy and hold levels.
+Of the two graphs, 
+the one colored blue, draws the close prices.
+The one colored red, draws the buy and hold levels.
+The blue graph starts at 1455, as shown on the left vertical axis, because
+that is where the close price levels start.
+On the other hand, 
+the red graph starts at 1, as shown on the right vertical axis, because
+that is where the buy-and-hold levels start.
+So the two graphs, the red and the blue, are basically the same graph,
+they just have different vertical axes and starting points.
+
+
+We still have not compared the trading system's cumulative returns
+with the stock cumulative returns.
+So let us do that now.
+Move up the rows and then move to cell Q1.
+The trading system cumulative returns are in column O, starting with a 1, in O3.
+The market cumulative returns are in column Q, starting with a 1, in Q3.
+To see the graph of these two columns, 
+move to the right to column A-E.
+
+So now we are in column A-E, at the top row.
+Here you will find a chart that plots the two curves both starting at 1.
+The one in blue draws the equity curve of the trading system.
+The one in red draws the buy-and-hold curve of the market, which is our stock.
+And the whole point of the comparison is to enable us to see if
+our trading system strategy beat the buy and hold strategy or not, which
+it appears to have done in this case for the most part.
+This comparison gives us a lot of information about the trading system, which
+is why it is essential to graph it.
+For example, the comparison tells us that 
+the performance of the trading system is very choppy, 
+choppier than that of the stock, which is not good.
+
+Having finished the equity curve calculation step (step 6) of the trading system steps,
+let us move on to step 7, 
+the calculation of first-level evaluation metrics such as:
+the annual return, the CAGR, and the Sharpe ratio.
+
+It is possible and convenient 
+to summarize the content of the equity curve chart we just discussed in a few numbers.
+Let us do that now.
+So go ahead and locate column V, entitled "Annual return."
+This is the annual return of the trading system.
+Open cell V3 to look at the formula.
+It says, ending balance minus starting balance,
+this difference is divided by the starting balance, which 
+gives us a ratio, and, then,
+this ratio is divided by the number of years to annualize it, and, finally,
+the result is multiplied by 100.
+You can move left to take a peek at column O, to look at what the formula is referring to.
+
+Moving on to column X entitled "CAGR,"
+which stands for "Compound annualized growth rate."
+This is the annualized average rate of revenue growth 
+between two given years, 
+assuming growth takes place at an exponentially compounded rate.
+The CAGR tells us more about the profitability of the trading system.
+Open cell X3 and look at the formula.
+It is calculated as 
+a ratio of the ending balance over the starting balance, 
+this ratio is then raised to the inverse of the number of years (to annualize it), and, then,
+subtract a 1, and, then, finally,
+the result is multiplied by 100.
+Again, you can find this financial formula 
+in cell B32 of the worksheet Formulas of the spreadsheet Returns.xlsx.
+You can move left to take a peek at column O, to look at what the formula is referring to.
+
+This particular CAGR formula in terms of ending balance and final balance may not be very intuitive.
+The Formulas worksheet of the Returns.xlsx spreadsheet shows that 
+there are many equivalent ways to calculate CAGR.
+The most intuitive formula in our opinion is B33 which says that
+the CAGR is just the geometric mean of the percent return factors
+(the factors we got by adding 1 to the percent returns.)
+
+The "Annual return," and CAGR formulas tell us something 
+about the growth of the profits generated by our trading system, but
+not about the risks the trading system took while 
+growing those profits.
+
+So go ahead and move to column W entitled "Sharpe" referring to Sharpe ratio.
+The Sharpe ratio is the return to risk formula that 
+measures the number of standard deviations of profit gained per number of standard deviations risked.
+Open cell W3.
+Here we see the formula: take the average of column M which
+has the raw percent returns of the trading system, and
+divide that number by the standard deviation of those same returns.
+After that, multiply the number by the square root of 360, which
+is an annualization factor that
+depends on the accounting calendar being used, 
+360 days or 365 days or 252 days (since there are 252 trading days in a year.)
+Again, you can find this formula in B29 of the Formulas worksheet of the Returns.xlsx spreadsheet.
+
+An important question is:
+What is a desirable Sharpe ratio?
+It should be close to, or above, 1 to be good.
+The Sharpe ratio we got here in W3 was worthless.
+
+The Sharpe ratio is a classic measure that is the best known but
+it can be unstable for machine learning purposes because 
+the Sharpe ratio obtained for training data
+tends to not carry over to the test data.
+Instead of the Sharpe ratio, for your final project,
+you could consider the Profit factor which
+is more stable.
+The Profit factor appears in column AC entitled "Profit factor."
+Open cell AC3.
+Here we see the formula for the Profit factor, which is 
+the ratio of the cumulated wins over the cumulated absolute losses.
+What is a desirable Profit factor?
+It should be close to, or above, 1.4 to be good.
+The Profit factor we got here in W3 was worthless.
+
+Step 8 of the trading system steps is the calculation of second-level evaluation metrics.
+This is the last step, but we will save it for later because 
+we calculate it in a separate Python script and not in this spreadsheet.
+
+So far we have shown you the application of the steps of a trading system
+to a single corpus of data.
+However, the trading system is usually applied twice,
+once to a training corpus of data, and
+a second time to a testing corpus of data, that 
+is usually dated to be later in the year than the training data.
+
+When the trading system is applied to the training data,
+the objective is to optimize the signals pertaining to step 2.
+So go ahead and move to the left, to columns H and I, that
+contain our short and long moving averages.
+How do you optimize these moving averages?
+For example, consider the short-moving average.
+It has a parameter, namely the length of the window in H1.
+We can try various values of this window length, while
+observing the impact on the Sharpe ratio, and, 
+finally, keeping the length that makes the Sharpe ratio as close to 1 as possible.
+If we change H1 to 3, let us do so now,
+the Sharpe ratio in column W goes down to 0.22.
+Let us go ahead and check this.
+Returning to columns H and I:
+If we change H1 to 42, the Sharpe ratio in column W goes up to 0.51, so
+we keep 42 as the window length of the short-moving average, as
+it is the optimal one for the training data.
+
+Once we have established 
+the best window lengths for the two moving averages 
+by trial and error in this way,
+we can apply the optimized trading system with the same 8 steps a second time,
+this time to the testing data.
+The objective of this second application is to ascertain that
+the evaluation metric results of the trading system
+are similar, within reason, for the training, and for the testing data.
+If the evaluation metric results are good for the training data, but
+are bad for the testing data,
+the trading system is not working, and
+needs to be redesigned.
+
+So far we have shown the steps of a trading system when
+using percent returns.
+But there are many reasons for preferring the use of log returns instead, which
+we have already mentioned in the first lesson of this course.
+For your final project,
+you will need to know how to carry out the 8 steps of the trading system
+using log returns.
+So the worksheet entitled 'Trading Log Returns' shows you how to do this.
+Again all the financial formulas in this particular worksheet 
+can be found in the worksheet Formulas of the spreadsheet Returns.xlsx; 
+specifically, you need to be looking at the column where log-returns are discussed,
+which is column C of this worksheet.
+
+The evaluation metrics when using percent returns are not the same as 
+the evaluation metrics when using log returns.
+When comparing trading systems, 
+be consistent:
+compare trading systems that are calculated using log returns with each other,
+compare trading systems that are calculated using percent returns with each other,
+or 
+if you need to compare heterogeneous trading systems,
+convert the log returns to percent returns 
+before calculating the evaluation metrics
+by applying the formula C36 in the worksheet Formulas of the spreadsheet Returns.xlsx.
+The formula says:
+percent return 
+equals the anti-natural-log function (i.e. the exponential function) 
+applied to the log returns, and, then,
+subtracting 1.
+
+
+
+
+
+</prosody>
+</speak>
+
+
+
+
+
+
+
+
+
