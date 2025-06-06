@@ -123,9 +123,8 @@ But they are not exactly the same.
 """
 
 ##build window momentum features
-for n in list(range(1,*)):
-    #####
-    #####
+for n in list(range(1,21)):
+    df[f'ret{n}'] = df["<OPEN>"].pct_change(periods=n).fillna(0)
 
 
 """
@@ -142,13 +141,21 @@ Only keep the dummies from "day" and "hour", not the original "day" and "hour" f
 """
 
 #build date time features
-df["hour"] = df.index...#####
-df["day"] = df.index....#####
-df_dummies_hour = #####
-df_dummies_day = #####
-df =df.join(df_dummies_hour)
-df=df.join(df_dummies_day)
-df.drop(...#####
+df["hour"] = df.index.hour
+df["day"] = df.index.dayofweek  # 0=Monday, 6=Sunday
+df_dummies_hour = pd.get_dummies(df["hour"], prefix='hour')
+df_dummies_day = pd.get_dummies(df["day"], prefix='day')
+# df =df.join(df_dummies_hour)
+# df=df.join(df_dummies_day)
+
+# make sure the new cols not exist yet
+df = df.drop(columns=df_dummies_hour.columns, errors='ignore')
+df = df.drop(columns=df_dummies_day.columns, errors='ignore')
+
+df = df.join(df_dummies_hour)
+df = df.join(df_dummies_day)
+
+df.drop(['hour', 'day'], axis=1, inplace=True)
 
 """
 INSTRUCTIONS
@@ -160,7 +167,7 @@ Save the forward returns as a column in the df with the name:
 """
  
 #build target assuming we know today's open
-df['retFut1'] = df['<OPEN>'].pct_change(*).shift(*) #if you enter the trade right after the open
+df['retFut1'] = df['<OPEN>'].pct_change(1).shift(-1) #if you enter the trade right after the open
 #df = np.log(df+1)
 
 #Since we are trading right after the open, we know today's open but
@@ -209,12 +216,19 @@ def plot_corr(corr, size=5, title="Pearson correlation"):
         title: title of the plot
     """
 
-    fig, ax = #####
+    fig, ax = plt.subplots(figsize=(12,10))
     #optionally, substitute the regular ax with an sns.heatmap (the regular ax has horrible colors)
-    ax = #####
-    ax.#####
-    plt.xticks(#####
-    plt.yticks(#####
+    ax = sns.heatmap(
+        corr, 
+        vmin=-1, vmax=1, center=0,
+        cmap=sns.diverging_palette(20, 220, n=200),
+        square=True,
+        annot=True,
+        annot_kws={"fontsize": 6}
+	)
+    ax.xaxis.tick_top()
+    plt.xticks(rotation=45, fontsize=8)
+    plt.yticks(rotation=0, fontsize=8)
     plt.title(title)
     #plt.tight_layout() #optionally can use this instead of rotation='vertical'
 
@@ -227,7 +241,7 @@ using the parameter exclude. Put the result in df_filtered
 
 #get the non-categorical data  by excluding the uint8 dtype
 #we do this because neither the spearman nor the pearson correlations can deal with categorical variables    
-df_filtered = #####
+df_filtered = df.select_dtypes(exclude='uint8')
 
 #Plot the matrix containing the pair-wise spearman coefficients
 #ideally we want to pay special attention to the correlation between each period return and retFut1    
@@ -247,6 +261,10 @@ plt.savefig(r'Results\%s.png' %("Pearson Correlation Matrix"))
 #This is optional in our case because we have tons of data.
 def calculate_pvalues(df, method='pearson'):
     df = df.dropna()._get_numeric_data()
+
+    # keep only numeric
+    df = df.select_dtypes(include=['number']).loc[:, df.dtypes != 'bool']
+
     dfcols = pd.DataFrame(columns=df.columns)
     pvalues = dfcols.transpose().join(dfcols, how='outer')
     for r in df.columns:
@@ -305,7 +323,7 @@ https://archive.is/v987w
 """
 
 def information_coefficient(y_true, y_pred):
-    rho, pval = ##### #spearman's rank correlation
+    rho, pval = spearmanr(y_true, y_pred) #spearman's rank correlation
     print (rho)
     return rho
 
@@ -319,8 +337,9 @@ def sharpe(y_true, y_pred):
 
 #myscorerNone = None #uses the default r2 score, not recommended
 #myscorer = "neg_mean_absolute_error"
-myscorerIC = make_scorer(...#####
-#myscorerSharpe = make_scorer(...#####
+myscorerIC = make_scorer(information_coefficient, greater_is_better=True)
+# myscorerSharpe = make_scorer(sharpe, greater_is_better=True)
+
 
 imputer = SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=0)
 #we turn off scaling because ..
@@ -343,7 +362,7 @@ array([1.00000000e-07, 2.33572147e-07, 5.45559478e-07, 1.27427499e-06,
        7.84759970e-02, 1.83298071e-01, 4.28133240e-01, 1.00000000e+00])
 """
 
-a_rs = np.logspace(...#####
+a_rs = np.logspace(-7, 0, 25)
 
 param_grid =  [{'ridge__alpha': a_rs}]
 
@@ -364,7 +383,7 @@ of the very large amount of training data.
 
 """
 
-grid_search = RandomizedSearchCV(pipe, param_grid, cv=5, scoring=*, return_train_score=True)
+grid_search = RandomizedSearchCV(pipe, param_grid, cv=5, scoring=myscorerIC, return_train_score=True)
 #grid_search = GridSearchCV(pipe, param_grid, cv=5, scoring=*, return_train_score=True)
 
 grid_search.fit(x_train.values, y_train.values.ravel())
@@ -453,9 +472,9 @@ save the residuals in residuals
 
 
 #plot the residuals
-true_y = #####
-pred_y = #####
-residuals = #####
+true_y = y_test.values.ravel()
+pred_y = grid_search.predict(x_test)
+residuals = np.subtract(true_y,pred_y)
 
 """
 RESULTS
@@ -475,7 +494,8 @@ they will spread over a larger than needed interval.
 from scipy.stats import norm
 from statsmodels.graphics.tsaplots import plot_acf
 fig, axes = plt.subplots(ncols=2, figsize=(14,4))
-sns.distplot(residuals, fit=norm, ax=axes[0], axlabel='Residuals', label='Residuals')
+# sns.distplot(residuals, fit=norm, ax=axes[0], axlabel='Residuals', label='Residuals')
+sns.histplot(residuals, kde=True, stat='density', ax=axes[0], label='Residuals', color='blue')
 axes[0].set_title('Residual Distribution')
 axes[0].legend()
 plot_acf(residuals, lags=10, zero=False, ax=axes[1], title='Residual Autocorrelation')
@@ -499,7 +519,7 @@ Otherwise, the residuals are autocorrelated and are not strongly stationary. (th
 #If the p-value of the test is greater than the required significance (>0.05), residuals are independent
 import statsmodels.api as sm
 lb = sm.stats.acorr_ljungbox(residuals, lags=[10], boxpierce=False)
-print("Ljung-Box test p-value", lb[1])
+print("Ljung-Box test p-value", lb['lb_pvalue'])
 
 
 """

@@ -167,7 +167,9 @@ for the SimpleImputer select strategy='constant', fill_value=0
 For guidance see:https://archive.is/hpwzH
 """
 
-numeric_sub_pipeline = #####
+numeric_sub_pipeline = Pipeline([('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                                 ('scaler', StandardScaler())])
+
 
 """
 INSTRUCTIONS
@@ -180,7 +182,8 @@ in OneHotEncoder set handle_unknown='ignore'
 For guidance see: https://archive.is/hpwzH
 """
 
-categorical_sub_pipeline = #####
+categorical_sub_pipeline = Pipeline([('imputer', SimpleImputer(strategy='constant', fill_value=0)),
+                                     ('ohe', OneHotEncoder(handle_unknown='ignore'))])
     
 """
 INSTRUCTIONS
@@ -193,8 +196,8 @@ For guidance see: https://archive.is/hpwzH
 """   
 
 print(x_train.dtypes)
-numeric_features_ix = #####
-categorical_features_ix = #####
+numeric_features_ix = x_train.select_dtypes('float64').columns
+categorical_features_ix = x_train.select_dtypes('int64').columns
 
 """
 INSTRUCTIONS
@@ -208,7 +211,9 @@ Note: transformer 3-element tuples can be: ('name', function or pipeline, column
 For guidance see: https://archive.is/hpwzH
 """   
 
-preprocessor = #####
+preprocessor = ColumnTransformer([('num', numeric_sub_pipeline, numeric_features_ix), 
+                                  ('cat', categorical_sub_pipeline, categorical_features_ix)],
+                                  remainder='passthrough')
 
 
 ridge = Ridge(max_iter=1000) 
@@ -233,7 +238,7 @@ that has access to the column names
 """   
 
 #grid_search.fit(x_train.values, y_train.values.ravel())
-grid_search.fit(*, y_train.values.ravel())
+grid_search.fit(x_train, y_train.values.ravel())
 
 best_parameters = grid_search.best_params_
 best_model = grid_search.best_estimator_
@@ -311,7 +316,8 @@ residuals = np.subtract(true_y, pred_y)
 from scipy.stats import norm
 from statsmodels.graphics.tsaplots import plot_acf
 fig, axes = plt.subplots(ncols=2, figsize=(14,4))
-sns.distplot(residuals, fit=norm, ax=axes[0], axlabel='Residuals', label='Residuals')
+# sns.distplot(residuals, fit=norm, ax=axes[0], axlabel='Residuals', label='Residuals')
+sns.histplot(residuals, kde=True, stat='density', ax=axes[0], label='Residuals', color='blue')
 axes[0].set_title('Residual Distribution')
 axes[0].legend()
 plot_acf(residuals, lags=10, zero=False, ax=axes[1], title='Residual Autocorrelation')
@@ -326,7 +332,7 @@ plt.savefig(r'Results\%s.png' %("Residuals"))
 #If the p-value of the test is greater than the required significance (>0.05), residuals are independent
 import statsmodels.api as sm
 lb = sm.stats.acorr_ljungbox(residuals, lags=[10], boxpierce=False)
-print("Ljung-Box test p-value", lb[1])
+print("Ljung-Box test p-value", lb['lb_pvalue'])
 
 """
 INSTRUCTIONS
@@ -342,7 +348,7 @@ for i in range(1,num_dummies+1):
     column_names.append('dummies_'+str(i))
     
 #plot the coefficients
-importance = pd.DataFrame(zip(best_model[*].coef_.ravel().tolist(), column_names))
+importance = pd.DataFrame(zip(best_model[1].coef_.ravel().tolist(), column_names))
 importance.columns = ['slope','feature_name']
 importance_plot = sns.barplot(x=importance['feature_name'], y=importance['slope'], data=importance,orient='v',dodge=False,order=importance.sort_values('slope',ascending=False).feature_name)
 for item in importance_plot.get_xticklabels(): #rotate the x labels by 90 degrees to avoid text overlapping
