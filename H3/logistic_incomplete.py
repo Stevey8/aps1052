@@ -55,7 +55,16 @@ you are going to use USDCAD currency data sampled every 3 hours here:
 USDCAD_H3_200001030000_202107201800.csv
 
 Note about the trading strategy in the homeworks:
-For simple trading model testing, many traders take the slightly unfair approach of measuring the normalized move from the close of the bar on which the indicators are known (e.g. today's close) to the next bar's close (tomorrow's close). This assumes we can enter the trade right exactly at today's close simultaneous with observing today's close, though this is not realistic. A more realistic scenario is to enter the trade at tomorrow's close after observing today's close and the model's prediction based on this observation, but this may be too long a delay.  Here, we assume instead that we can enter a position immediately after the open. The "bar" on which the indicators are known consists of today's open,  yesterday's high, yesterday's low, yesterday's close.  The target predicted by the model is the normalized move from today's open to tomorrow's open, and we take a position right after today's open having observed today's open and the model's prediction based on this observation.
+For simple trading model testing, many traders take the slightly unfair approach of measuring the normalized move from the close of the bar 
+on which the indicators are known (e.g. today's close) to the next bar's close (tomorrow's close). 
+This assumes we can enter the trade right exactly at today's close simultaneous with observing today's close, though this is not realistic. 
+A more realistic scenario is to enter the trade at tomorrow's close after observing today's close and the model's prediction based on this observation, 
+but this may be too long a delay.  
+Here, we assume instead that we can enter a position immediately after the open. 
+The "bar" on which the indicators are known consists of today's open,  yesterday's high, yesterday's low, yesterday's close.  
+The target predicted by the model is the normalized move from today's open to tomorrow's open, 
+and we take a position right after today's open having observed today's open and the model's prediction based on this observation.
+
 Trading the open is attractive for many reasons: 
 e.g. 
 https://archive.is/PIuUW
@@ -116,9 +125,9 @@ But they are not the same.
 
 """
 #build window features, assuming we know today's open. Include fillna(0)
-for n in list(range(1,*)):
-    name = #####
-    df[name] = #####
+for n in list(range(1,21)):
+    name = f'ret{str(n)}'
+    df[name] = df["<OPEN>"].pct_change(periods=n).fillna(0)
 
 
 """
@@ -133,25 +142,32 @@ extract the dayofweek from the index and save it in the df as a column with name
 """
 
 #build date-time features
-df["hour"] = #####
-df["day"] = #####
+df["hour"] = df.index.hour
+df["day"] = df.index.dayofweek  # 0=Monday, 6=Sunday
 df_dummies_hour = pd.get_dummies(df["hour"], prefix='hour')
 df_dummies_day = pd.get_dummies(df["day"], prefix='day')
-df =df.join(df_dummies_hour)
-df=df.join(df_dummies_day)
+# df =df.join(df_dummies_hour)
+# df=df.join(df_dummies_day)
 
+# make sure the new cols not exist yet
+df = df.drop(columns=df_dummies_hour.columns, errors='ignore')
+df = df.drop(columns=df_dummies_day.columns, errors='ignore')
+
+df = df.join(df_dummies_hour)
+df = df.join(df_dummies_day)
 
 """
 INSTRUCTIONS
 build target so as to trade right after the open (we know today's open)
-Use df['<OPEN>'].pct_change(*).shift(*) (substituting * by -n or n as appropriate, with n=1 or 2 or 3 etc.)
+Use df['<OPEN>'].pct_change(*).shift(*) (substituting * by -n or n as appropriate, 
+with n=1 or 2 or 3 etc.)
 to calculate the "one period forward returns" (the prediction target).
 Save the forward returns as a column in the df with the name:
  "retFut1".
 """
 
 #build target assuming we know today's open
-df['retFut1'] = df['<OPEN>'].pct_change(*).shift(*).fillna(0) #if you enter the trade immediately after the open
+df['retFut1'] = df['<OPEN>'].pct_change(1).shift(-1).fillna(0) #if you enter the trade immediately after the open
 
 
 """
@@ -165,7 +181,7 @@ to effect this transformation
 """
 
 #transform the target
-df['retFut1_categ'] =  np.where(#####
+df['retFut1_categ'] = np.where(df['retFut1'] > 0, 1, 0)  
         
 #Since we are trading right after the open, 
 #we only know yesterday's  high low close volume spread etc.
@@ -361,7 +377,7 @@ https://archive.is/v987w
 """
 
 #myscorerNone = None #use default accuracy score
-myscorerPhik = make_scorer(...#####
+myscorerPhik = make_scorer(phi_k, greater_is_better=True)
 
 imputer = SimpleImputer(missing_values=np.nan, strategy="constant", fill_value=0)
 scaler = StandardScaler(with_mean=False, with_std=False)
@@ -383,7 +399,7 @@ array([1.00000000e+03, 4.28133240e+02, 1.83298071e+02, 7.84759970e+01,
 
 """
 
-c_rs = np.logspace(...#####
+c_rs = np.logspace(3, -4, 20)
 #penalty type=L2 like ridge regression (small coefficients preferred), L1 like lasso  (coefficients can become zero)
 p_rs= ["l1", "l2"]
 
@@ -407,8 +423,8 @@ of the very large amount of training data.
 Run the program a few times, with and without the "day" and  "hour" dummies.
 """
 
-grid_search = RandomizedSearchCV(pipe, param_grid, cv=5, scoring=*, return_train_score=True) #####
-#grid_search = GridSearchCV(pipe, param_grid, cv=5, scoring=*, return_train_score=True) #####
+grid_search = RandomizedSearchCV(pipe, param_grid, cv=5, scoring=myscorerPhik, return_train_score=True) #####
+#grid_search = GridSearchCV(pipe, param_grid, cv=5, scoring=myscorerPhik, return_train_score=True) #####
 
 grid_search.fit(x_train.values, y_train.values.ravel())
 
@@ -514,15 +530,16 @@ save the residuals in residuals
 """
 
 #plot the residuals
-true_y = #####
-pred_y = #####
-residuals = #####
+true_y = y_test.values.ravel()
+pred_y = grid_search.predict(x_test)
+residuals = np.subtract(true_y, pred_y)
 
 
 from scipy.stats import norm
 from statsmodels.graphics.tsaplots import plot_acf
 fig, axes = plt.subplots(ncols=2, figsize=(14,4))
-sns.distplot(residuals, fit=norm, ax=axes[0], axlabel='Residuals', label='Residuals')
+# sns.distplot(residuals, fit=norm, ax=axes[0], axlabel='Residuals', label='Residuals') # distplot is deprecated
+sns.histplot(residuals, kde=True, stat="density", ax=axes[0], label='Residuals')
 axes[0].set_title('Residual Distribution')
 axes[0].legend()
 plot_acf(residuals, lags=10, zero=False, ax=axes[1], title='Residual Autocorrelation')
@@ -537,7 +554,9 @@ plt.close("all")
 #If the p-value of the test is greater than the required significance (>0.05), residuals are independent
 import statsmodels.api as sm
 lb = sm.stats.acorr_ljungbox(residuals, lags=[10], boxpierce=False)
-print("Ljung-Box test p-value", lb[1])
+# print("Ljung-Box test p-value", lb[1]) # wrong indexing
+print("Ljung-Box test p-value", lb['lb_pvalue'])
+
 
 
 
