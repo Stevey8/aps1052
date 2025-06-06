@@ -1,0 +1,18 @@
+The instructions are inside the Python scrypt (.py) files.
+Read the entire file to the end before you start.
+Each homework has an answer given in Results_
+The answers are unique and fixed by the line:
+
+np.random.seed() #to fix the results
+
+If your answer differs from the one we have given, 
+that is ok, as long as it is within reason.
+Always compare your answer to ours to make sure you understood.
+
+
+Note about the trading strategy in the homeworks:
+For simple trading model testing, many traders take the slightly unfair approach of measuring the normalized move from the close of the bar on which the indicators are known (e.g. today's close) to the next bar's close (tomorrow's close). This assumes we can enter the trade right exactly at today's close simultaneous with observing today's close, though this is not realistic. A more realistic scenario is to enter the trade at tomorrow's close after observing today's close and the model's prediction based on this observation, but this may be too long a delay.  Here, we assume instead that we can enter a position immediately after the open. The "bar" on which the indicators are known consists of today's open,  yesterday's high, yesterday's low, yesterday's close.  The target predicted by the model is the normalized move from today's open to tomorrow's open, and we take a position right after today's open having observed today's open and the model's prediction based on this observation.
+Trading the open is attractive for many reasons: 
+e.g. 
+https://archive.is/PIuUW
+https://archive.is/nt9lE
