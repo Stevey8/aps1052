@@ -216,8 +216,10 @@ For guidance see: https://archive.is/hpwzH
 #Note: transformer 3-element tuples can be: ('name', function or pipeline, column_number_list or column_index)
 preprocessor = ColumnTransformer(
     transformers=[
-        #####,
-        #####], remainder='passthrough')
+        ('num', numeric_sub_pipeline, numeric_features_ix),
+        ('cat', categorical_sub_pipeline, categorical_features_ix),
+    ], remainder='passthrough')
+
 
 
 logistic = LogisticRegression(max_iter=1000, solver='liblinear') 
@@ -341,13 +343,15 @@ sns.despine()
 fig.tight_layout();
 #plt.show()
 plt.savefig(r'Results\%s.png' %("ResidualDistribution"))
+
+
 plt.close("all")
 
 #Residual autocorrelation
 #If the p-value of the test is greater than the required significance (>0.05), residuals are independent
 import statsmodels.api as sm
 lb = sm.stats.acorr_ljungbox(residuals, lags=[10], boxpierce=False)
-print("Ljung-Box test p-value", lb[1])
+print("Ljung-Box test p-value", lb.iloc[0, 1])
 
 """
 INSTRUCTIONS:
@@ -360,11 +364,11 @@ Save the result in detrended_retFut1
 """
 
 #Detrending Prices and Returns and white reality check
-detrended_open = #####
-detrended_retFut1 = #####
+detrended_open = detrendPrice.detrendPrice(openp)
+detrended_retFut1 = detrended_open.pct_change(1).shift(-1).fillna(0)
 detrended_syst_rets = detrended_retFut1 * pd.Series(positions2).fillna(0)
 WhiteRealityCheckFor1.bootstrap(detrended_syst_rets)
-plt.show()
+# plt.show()
 
 column_names = []
 num_numeric = int(len(numeric_features_ix)*percentile/100)
@@ -380,7 +384,7 @@ importance.columns = ['slope','feature_name']
 importance_plot = sns.barplot(x=importance['feature_name'], y=importance['slope'], data=importance,orient='v',dodge=False,order=importance.sort_values('slope',ascending=False).feature_name)
 for item in importance_plot.get_xticklabels(): #rotate the x labels by 90 degrees to avoid text overlapping
     item.set_rotation(90)
-plt.show()
+# plt.show()
 plt.savefig(r'Results\%s.png' %("Coefficients"))
 
 

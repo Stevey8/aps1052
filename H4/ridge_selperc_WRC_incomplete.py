@@ -48,8 +48,8 @@ np.random.seed(1) #to fix the results
 rs = 2
 
 #uncomment if you want to redirect print output to outputfile.txt 
-#file_path = 'outputfile.txt'
-#sys.stdout = open(file_path, "w")
+file_path = 'outputfile.txt'
+sys.stdout = open(file_path, "w")
 
 
 #df = pd.read_csv('EURUSD_H3_200001030000_202107201800.csv', sep='\t')
@@ -152,14 +152,39 @@ Following this model, fill in the missing code in information_coefficient_select
 See Spearman correlation coefficient, slide 39 RegressionChannelSimple.pptx (Pandas Homework).
 """
 
-def information_coefficient_select(X, y):
-    #Function taking two arrays X and y, and returning a pair of arrays (scores, pvalues) or a single array with scores.
-    #Model: https://archive.is/qxCbT
-    rho_arr =  ##### (array of zeros)
-    pval_arr = ##### (array of zeros)
-    for i in range(X.shape[1]):
-         ##### call spearmanr
-    return rho_arr, pval_arr
+def information_coefficient_select(X, y, method = 'spearman'):
+        '''
+        Function taking two arrays X and y, and returning a pair of arrays (scores, pvalues) 
+        or a single array with scores.
+        '''    
+        # Model: https://archive.is/qxCbT i.e., sklearn.feature_selection.f_regression
+        # use spearmanr here 
+
+        rho_arr = np.zeros(X.shape[1])  # (array of zeros)
+        pval_arr = np.zeros(X.shape[1])  # (array of zeros)
+
+        # make sure it works for both pandas DataFrame and numpy array
+        X_values = X.values if hasattr(X, "values") else X
+        y_values = y.values.ravel() if hasattr(y, "values") else np.ravel(y)
+
+
+        if method == 'spearman':
+            for i in range(X_values.shape[1]):
+                rho, pval = spearmanr(X_values[:, i], y_values)
+                rho_arr[i] = rho
+                pval_arr[i] = pval
+
+
+        # elif method == 'f_regression':
+        #      rho_arr, pval_arr = f_regression(X, y.values.ravel())
+
+        # else:
+        #      raise ValueError("Method must be either 'spearman' or 'f_regression'.")
+        else:
+            raise ValueError("Method must be 'spearman'.")
+
+        return rho_arr, pval_arr
+
 
 #myscorer = None #uses the default r2 score, not recommended
 #myscorer = "neg_mean_absolute_error"
@@ -179,7 +204,8 @@ As regards the numeric_transformer: add a third step called 'selector'
 numeric_sub_pipeline = Pipeline(steps=[
     ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
     ('scaler', StandardScaler()),
-    #####])
+    ('selector', selector)])
+
 categorical_sub_pipeline = Pipeline(steps=[
     ('imputer', SimpleImputer(strategy='constant', fill_value=0)),
     ('onehot', OneHotEncoder(handle_unknown='ignore'))])
@@ -296,13 +322,16 @@ sns.despine()
 fig.tight_layout();
 #plt.show()
 plt.savefig(r'Results\%s.png' %("Residuals"))
+
+
 plt.close("all") 
 
 #Residual autocorrelation
 #If the p-value of the test is greater than the required significance (>0.05), residuals are independent
 import statsmodels.api as sm
 lb = sm.stats.acorr_ljungbox(residuals, lags=[10], boxpierce=False)
-print("Ljung-Box test p-value", lb[1])
+# print("Ljung-Box test p-value", lb[1])
+print("Ljung-Box test p-value", lb.iloc[0, 1])  # p-value for the first lag
 
 """
 INSTRUCTIONS:
@@ -315,11 +344,11 @@ Save the result in detrended_retFut1
 """
 
 #Detrending Prices and Returns and white reality check
-detrended_open = #####
-detrended_retFut1 = #####
+detrended_open = detrendPrice.detrendPrice(openp[10000:12000]) # only test set
+detrended_retFut1 = detrended_open.pct_change(1).fillna(0) 
 detrended_syst_rets = detrended_retFut1 * pd.Series(positions2).fillna(0)
 WhiteRealityCheckFor1.bootstrap(detrended_syst_rets)
-plt.show()
+# plt.show()
 
 
 column_names = []
@@ -336,7 +365,7 @@ importance.columns = ['slope','feature_name']
 importance_plot = sns.barplot(x=importance['feature_name'], y=importance['slope'], data=importance,orient='v',dodge=False,order=importance.sort_values('slope',ascending=False).feature_name)
 for item in importance_plot.get_xticklabels(): #rotate the x labels by 90 degrees to avoid text overlapping
     item.set_rotation(90)
-plt.show()
+# plt.show()
 plt.savefig(r'Results\%s.png' %("Coefficients"))
 
 
