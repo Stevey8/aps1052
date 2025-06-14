@@ -161,7 +161,9 @@ plt.savefig(r'Results\%s.png' %("Pearson Correlation Matrix"))
 #You want to plot the significance of the correlations
 #This is optional in our case because we have tons of data.
 def calculate_pvalues(df, method='pearson'):
-    df = df.dropna()._get_numeric_data()
+    # df = df.dropna()._get_numeric_data()
+    df = df.dropna().select_dtypes(include=['number']).loc[:, df.dtypes != 'bool']
+
     dfcols = pd.DataFrame(columns=df.columns)
     pvalues = dfcols.transpose().join(dfcols, how='outer')
     for r in df.columns:
@@ -219,7 +221,19 @@ The function is called further below.
 """
 
 def profit_ratio(y_true, y_pred):
-    #####
+    positions = np.where(y_pred > 0, 1, -1)
+    positions = np.nan_to_num(positions, nan=0.0)
+
+    daily_ret = positions * y_true
+    daily_ret = np.nan_to_num(daily_ret, nan=0.0)
+
+    profit = np.sum(daily_ret[daily_ret > 0])
+    loss = -np.sum(daily_ret[daily_ret < 0])
+    if loss == 0:
+        profit_ratio = np.inf 
+    else:
+        profit_ratio = profit / loss
+    
     return profit_ratio
     
 
@@ -244,7 +258,7 @@ ridge_profit_ratio_results_incomplete.txt
 #myscorer = "neg_mean_absolute_error"
 #myscorer = make_scorer(information_coefficient, greater_is_better=True)
 #myscorer = make_scorer(sharpe, greater_is_better=True)
-myscorer = #####
+myscorer = make_scorer(information_coefficient, greater_is_better=True)
 
 imputer = SimpleImputer(strategy="constant", fill_value=0)
 #we turn off scaling because we should not scale dummies (and returns are already mostly scaled)
@@ -304,9 +318,9 @@ complete the profit_ratio (p_ratio) code below
 cagr = (1 + cumret[-1]) ** (252 / len(cumret)) - 1
 maxDD, maxDDD = fAux.calculateMaxDD(cumret)
 s_ratio = (252.0 ** (1.0/2.0)) * np.mean(dailyRet) / np.std(dailyRet)
-profits = #####
-losses = #####
-p_ratio = #####
+profits = np.sum(dailyRet[dailyRet > 0])
+losses = -np.sum(dailyRet[dailyRet < 0])
+p_ratio = profits / losses if losses != 0 else np.inf
 print (('In-sample: CAGR={:0.6} Sharpe ratio={:0.6} Profit ratio={:0.6} maxDD={:0.6} maxDDD={:d} Calmar ratio={:0.6}\n'\
 ).format(cagr, s_ratio, p_ratio, maxDD, maxDDD.astype(int), -cagr/maxDD))
 
@@ -340,9 +354,9 @@ make sure you use dailyRet2, not dailyRet
 cagr = (1 + cumret2[-1]) ** (252*8 / len(cumret2)) - 1
 maxDD, maxDDD = fAux.calculateMaxDD(cumret2)
 s_ratio = (252.0 ** (1.0/2.0)) * np.mean(dailyRet2) / np.std(dailyRet2)
-profits = #####
-losses = #####
-p_ratio = #####
+profits = np.sum(dailyRet2[dailyRet2 > 0])
+losses = -np.sum(dailyRet2[dailyRet2 < 0])
+p_ratio = profits / losses if losses != 0 else np.inf
 print (('Out-of-sample: CAGR={:0.6} Sharpe ratio={:0.6} Profit ratio={:0.6} maxDD={:0.6} maxDDD={:d} Calmar ratio={:0.6}\n'\
 ).format(cagr, s_ratio, p_ratio, maxDD, maxDDD.astype(int), -cagr/maxDD))
 
@@ -355,7 +369,9 @@ residuals = np.subtract(true_y, pred_y)
 from scipy.stats import norm
 from statsmodels.graphics.tsaplots import plot_acf
 fig, axes = plt.subplots(ncols=2, figsize=(14,4))
-sns.distplot(residuals, fit=norm, ax=axes[0], axlabel='Residuals', label='Residuals')
+# sns.distplot(residuals, fit=norm, ax=axes[0], axlabel='Residuals', label='Residuals')
+# use histplot instead of distplot
+sns.histplot(residuals, kde=True, stat='density', ax=axes[0], label='Residuals')
 axes[0].set_title('Residual Distribution')
 axes[0].legend()
 plot_acf(residuals, lags=10, zero=False, ax=axes[1], title='Residual Autocorrelation')
@@ -370,7 +386,7 @@ plt.close("all")
 #If the p-value of the test is greater than the required significance (>0.05), residuals are independent
 import statsmodels.api as sm
 lb = sm.stats.acorr_ljungbox(residuals, lags=[10], boxpierce=False)
-print("Ljung-Box test p-value", lb[1])
+print("Ljung-Box test p-value", lb.iloc[0, 1])
 
 
 #plot the coefficients
