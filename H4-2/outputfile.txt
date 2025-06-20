@@ -1,0 +1,155 @@
+ret1     float64
+ret2     float64
+ret3     float64
+ret4     float64
+ret5     float64
+ret6     float64
+ret7     float64
+ret8     float64
+ret9     float64
+ret10    float64
+ret11    float64
+ret12    float64
+ret13    float64
+ret14    float64
+ret15    float64
+ret16    float64
+ret17    float64
+ret18    float64
+ret19    float64
+ret20    float64
+hour       int32
+day        int32
+dtype: object
+Best parameters : {'ridge__alpha': 0.4281332398719387}
+Best cross-validation score : 110.13
+In-sample: CAGR=0.0182313 Sharpe ratio=0.721188 Profit ratio=1.14727 maxDD=-0.148364 maxDDD=4589 Calmar ratio=0.122882
+
+Out-of-sample: CAGR=0.0246302 Sharpe ratio=0.766046 Profit ratio=1.14624 maxDD=-0.0567613 maxDDD=387 Calmar ratio=0.433925
+
+Out-of-sample: CAGR=0.0246302 Sharpe ratio=0.766046 Profit ratio=1.14624 maxDD=-0.0567613 maxDDD=387 Calmar ratio=0.433925
+
+0.024630153795256016 0.7660456948648716 1.1462402753299092 -0.056761271949620884 387.0
+0.024630153795256016
+0.7660456948648716
+1.1462402753299092
+-0.056761271949620884
+387.0
+0.024630153795256016
+hey
+Ljung-Box test p-value 0.0014345759405476348
+average return 0.001032
+[-0.00311835  0.00295417]
+Do not reject Ho = The population distribution of rule returns has an expected value of zero or less (because p_value is not small enough)
+p_value:
+0.2502
+0.024630153795256016 0.7660456948648716 1.1462402753299092 -0.056761271949620884 387.0
+0.024630153795256016
+0.7660456948648716
+1.1462402753299092
+-0.056761271949620884
+387.0
+0.024630153795256016
+hey
+0.024630153795256016 0.7660456948648716 1.1462402753299092 -0.056761271949620884 387.0
+0.024630153795256016
+0.7660456948648716
+1.1462402753299092
+-0.056761271949620884
+387.0
+0.024630153795256016
+hey
+CAGR: 0.024630153795256016
+ret1     float64
+ret2     float64
+ret3     float64
+ret4     float64
+ret5     float64
+ret6     float64
+ret7     float64
+ret8     float64
+ret9     float64
+ret10    float64
+ret11    float64
+ret12    float64
+ret13    float64
+ret14    float64
+ret15    float64
+ret16    float64
+ret17    float64
+ret18    float64
+ret19    float64
+ret20    float64
+hour       int32
+day        int32
+dtype: object
+Best parameters : {'ridge__alpha': 0.4281332398719387}
+Best cross-validation score : 107.28
+In-sample: CAGR=0.0223999 Sharpe ratio=0.881835 Profit ratio=1.18297 maxDD=-0.0473051 maxDDD=823 Calmar ratio=0.47352
+
+Out-of-sample: CAGR=0.0233766 Sharpe ratio=0.728241 Profit ratio=1.13854 maxDD=-0.0541553 maxDDD=270 Calmar ratio=0.431659
+
+Out-of-sample: CAGR=0.0233766 Sharpe ratio=0.728241 Profit ratio=1.13854 maxDD=-0.0541553 maxDDD=270 Calmar ratio=0.431659
+
+ret1     float64
+ret2     float64
+ret3     float64
+ret4     float64
+ret5     float64
+ret6     float64
+ret7     float64
+ret8     float64
+ret9     float64
+ret10    float64
+ret11    float64
+ret12    float64
+ret13    float64
+ret14    float64
+ret15    float64
+ret16    float64
+ret17    float64
+ret18    float64
+ret19    float64
+ret20    float64
+hour       int32
+day        int32
+dtype: object
+Best parameters : {'ridge__alpha': 0.18329807108324336}
+Best cross-validation score : 105.48
+In-sample: CAGR=0.01948 Sharpe ratio=0.769354 Profit ratio=1.15785 maxDD=-0.0752582 maxDDD=1362 Calmar ratio=0.258842
+
+Out-of-sample: CAGR=0.0112356 Sharpe ratio=0.360234 Profit ratio=1.06627 maxDD=-0.0706479 maxDDD=1555 Calmar ratio=0.159037
+
+Out-of-sample: CAGR=0.0112356 Sharpe ratio=0.360234 Profit ratio=1.06627 maxDD=-0.0706479 maxDDD=1555 Calmar ratio=0.159037
+
+ret1     float64
+ret2     float64
+ret3     float64
+ret4     float64
+ret5     float64
+ret6     float64
+ret7     float64
+ret8     float64
+ret9     float64
+ret10    float64
+ret11    float64
+ret12    float64
+ret13    float64
+ret14    float64
+ret15    float64
+ret16    float64
+ret17    float64
+ret18    float64
+ret19    float64
+ret20    float64
+hour       int32
+day        int32
+dtype: object
+Best parameters : {'ridge__alpha': 0.18329807108324336}
+Best cross-validation score : 107.68
+In-sample: CAGR=0.0215248 Sharpe ratio=0.848142 Profit ratio=1.17539 maxDD=-0.0612629 maxDDD=3161 Calmar ratio=0.351351
+
+Out-of-sample: CAGR=0.0374672 Sharpe ratio=1.15138 Profit ratio=1.22782 maxDD=-0.0327017 maxDDD=221 Calmar ratio=1.14572
+
+Out-of-sample: CAGR=0.0374672 Sharpe ratio=1.15138 Profit ratio=1.22782 maxDD=-0.0327017 maxDDD=221 Calmar ratio=1.14572
+

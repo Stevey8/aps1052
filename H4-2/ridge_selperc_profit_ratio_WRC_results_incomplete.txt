@@ -1,0 +1,22 @@
+ridge_selperc_profit_ratio_WRC_results.txt
+
+Write in the out-of-sample results of runing the script again, using different selectors.
+We have already written in the out-of-sample results of using f_regression.
+The out-of-sample results you need to obtain to do this are printed out in outputfile.txt
+
+selector = SelectPercentile(score_func=f_regression, percentile=percentile) #linear criterion 
+Out-of-sample: CAGR=0.0229744 Sharpe ratio=0.716107 Profit ratio=1.13608 maxDD=-0.0578763 maxDDD=414 Calmar ratio=0.396957
+
+selector = SelectPercentile(score_func=mutual_info_regression, percentile=percentile) #non linear criterion
+Out-of-sample: CAGR=0.0233766 Sharpe ratio=0.728241 Profit ratio=1.13854 maxDD=-0.0541553 maxDDD=270 Calmar ratio=0.431659
+
+selector = SelectPercentile(score_func=information_coefficient_select, percentile=percentile) #non linear criterion
+Out-of-sample: CAGR=0.0112356 Sharpe ratio=0.360234 Profit ratio=1.06627 maxDD=-0.0706479 maxDDD=1555 Calmar ratio=0.159037
+
+selector = SelectPercentile(score_func=profit_ratio_select, percentile=percentile) #non linear criterion
+Out-of-sample: CAGR=0.0374672 Sharpe ratio=1.15138 Profit ratio=1.22782 maxDD=-0.0327017 maxDDD=221 Calmar ratio=1.14572
+
+To maximize the Profit ratio,
+the best selectors should be mutual_info_regression and profit_ratio_select.
+However, since profit_ratio_select is so slow,
+best use mutual_info_regression.
