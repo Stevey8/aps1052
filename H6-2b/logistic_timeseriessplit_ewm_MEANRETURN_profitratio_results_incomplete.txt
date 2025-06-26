@@ -1,0 +1,43 @@
+Fill out the out-of-sample results by changing myscorer and running the script again.
+We have already filled out the out-of-sample results for when myscorer is accuracy.
+
+
+myscorer = None #use default accuracy score
+Out-of-sample: CAGR=0.281156 Sharpe ratio=0.971297 Profit ratio=1.18898 maxDD=-0.0458547 maxDDD=250 Calmar ratio=6.13146
+
+myscorer = make_scorer(phi_k, greater_is_better=True)
+Out-of-sample: CAGR=0.25028 Sharpe ratio=0.876961 Profit ratio=1.16914 maxDD=-0.0486243 maxDDD=437 Calmar ratio=5.14722
+
+myscorer = make_scorer(mean_return, greater_is_better=True)
+Out-of-sample: CAGR=0.209547 Sharpe ratio=0.749027 Profit ratio=1.14277 maxDD=-0.0469895 maxDDD=298 Calmar ratio=4.45944
+
+myscorer = make_scorer(profit_ratio, greater_is_better=True)
+Out-of-sample: CAGR=0.263163 Sharpe ratio=0.916591 Profit ratio=1.17743 maxDD=-0.0593634 maxDDD=380 Calmar ratio=4.43309
+
+a rather surprising result.
+
+Compare the results of WhiteRealityCheck and WhiteRealityCheckFor1_accelerated 
+Use myscorer = None #use default accuracy score
+
+(original text provided by the assignment)
+The WhiteRealityCheckFor1:
+p_value:
+0.16900000000000004
+uncorrected CI (log-returns, daily):  [-0.00293088  0.00286695]
+
+(actual stats calculated from the script)
+The WhiteRealityCheckFor1:
+p_value:
+0.5992
+uncorrected CI (log-returns, daily):  [-0.00293225  0.0029664 ]
+
+
+
+WhiteRealityCheckFor1_accelerated:
+p_value:
+0.5848
+corrected CI: [-0.00302639  0.00285661]
+Low bound, there is a 90% chance that our return is at least:  -0.0027010870415249497
+High bound, there is a 90% chance that our return is at most:  0.0012667849835947607
+
+WhiteRealityCheckFor1_accelerated (Timothy Master's version of White's function) is more exact than WhiteRealityCheckFor1, expecially the confidence interval.
