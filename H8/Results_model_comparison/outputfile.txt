@@ -1,0 +1,29 @@
+ret1     float64
+ret2     float64
+ret3     float64
+ret4     float64
+ret11    float64
+ret14    float64
+hour       int64
+day        int64
+dtype: object
+KNeighborsClassifier(n_neighbors=3)
+model score: 0.514
+SVC(C=0.025, probability=True)
+model score: 0.520
+NuSVC(probability=True)
+model score: 0.502
+DecisionTreeClassifier()
+model score: 0.502
+RandomForestClassifier()
+model score: 0.533
+AdaBoostClassifier()
+model score: 0.543
+GradientBoostingClassifier()
+model score: 0.542
+[2 2 2 2 2 2 2 2 2 2 2 2 2]
+MixedNB(alpha=0.5, var_smoothing=1e-09)
+model score: 0.503
+for mixedNB (again)
+[8 5]
+model score: 0.503

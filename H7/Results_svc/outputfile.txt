@@ -1,0 +1,40 @@
+<OPEN>     float64
+<HIGH>     float64
+<LOW>      float64
+<CLOSE>    float64
+ret1       float64
+ret2       float64
+ret3       float64
+ret4       float64
+ret5       float64
+ret6       float64
+ret7       float64
+ret8       float64
+ret9       float64
+ret10      float64
+ret11      float64
+ret12      float64
+ret13      float64
+ret14      float64
+hour         int64
+day          int64
+RSI        float64
+SMA        float64
+Corr       float64
+SAR        float64
+ADX        float64
+OO         float64
+OC         float64
+dtype: object
+Best parameters : {'t__rsiadx__kw_args': {'timeperiod': 5}, 'svc__C': 0.007196856730011528}
+Best cross-validation score : 39.34
+In-sample: CAGR=0.0820349 Sharpe ratio=3.16196 maxDD=-0.0329737 maxDDD=251 Calmar ratio=2.48789
+
+Out-of-sample: CAGR=0.0308721 Sharpe ratio=0.953798 maxDD=-0.0511843 maxDDD=503 Calmar ratio=0.603156  phi_k_corr=0.206576 phi_k_p_val=0.000349268  accuracy_score=0.433
+
+Ljung-Box test p-value [3.00645312e-56]
+average return 0.001758
+[-0.00289287  0.00286244]
+Do not reject Ho = The population distribution of rule returns has an expected value of zero or less (because p_value is not small enough)
+p_value:
+0.11580000000000001
