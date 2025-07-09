@@ -1,0 +1,10 @@
+1.NN_ridge_regression_incomplete.ipynb 
+How to implement a ridge regression model using keras+tensorflow
+2.NN_logistic_regression_incomplete.ipynb  
+How to implement a logistic regression model using keras+tensorflow
+3.NN_SVM_classifier_incomplete.ipynb  
+How to implement an SVM classifier model using keras+tensorflow
+4.spearman_corr_incomplete.ipynb 
+How to customize a metric function (the spearman correlation metric) using using keras+tensorflow
+5.pearson_corr_incomplete.ipynb 
+How to customize a loss function (a penalized pearson correlation metric) using using keras+tensorflow
